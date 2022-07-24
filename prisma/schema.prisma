@@ -19,8 +19,10 @@ model User {
 }
 
 model Posts {
-  id      Int    @id @default(autoincrement())
-  content String
-  User    User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId  Int?
+  id         Int      @id @default(autoincrement())
+  content    String
+  User       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int?
+  createdAt  DateTime @default(now())
+  updatedAat DateTime @default(now()) @updatedAt
 }

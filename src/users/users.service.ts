@@ -4,13 +4,35 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { user } from './entities/user.entity';
 
+const select = {
+  id: true,
+  email: true,
+  name: true,
+};
+
+type TUser = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+type TPayload = {
+  id: number;
+  email: string;
+  name: string;
+  iat: number;
+  exp: number;
+};
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateUserDto): Promise<user> {
+  async create(data: CreateUserDto): Promise<TUser> {
     try {
-      return await this.prisma.user.create({ data });
+      return await this.prisma.user.create({
+        data,
+        select,
+      });
     } catch (error) {
       if (error.message.substring('Unique constraint')) {
         throw new HttpException('Email already used', HttpStatus.BAD_REQUEST);
@@ -22,9 +44,11 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<user[]> {
+  async findAll(): Promise<TUser[]> {
     try {
-      return await this.prisma.user.findMany();
+      return await this.prisma.user.findMany({
+        select,
+      });
     } catch (error) {
       throw new HttpException(
         'Internal Server Error ',
@@ -33,16 +57,13 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number): Promise<object> {
+  async findOne(id: number): Promise<TUser> {
     try {
       return await this.prisma.user.findUnique({
         where: {
           id,
         },
-        select: {
-          email: true,
-          name: true,
-        },
+        select,
       });
     } catch (error) {
       throw new HttpException(
@@ -67,8 +88,14 @@ export class UsersService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<object> {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    user: TPayload,
+  ): Promise<TUser> {
     try {
+      if (id !== user.id) throw new Error('users');
+
       return await this.prisma.user.update({
         where: {
           id,
@@ -76,6 +103,12 @@ export class UsersService {
         data: updateUserDto,
       });
     } catch (error) {
+      if (error.message.substring('users')) {
+        throw new HttpException(
+          'You cannot edit other users!',
+          HttpStatus.CONFLICT,
+        );
+      }
       throw new HttpException(
         'Internal Server Error ',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -83,13 +116,21 @@ export class UsersService {
     }
   }
 
-  async remove(id: number): Promise<object> {
+  async remove(id: number, user): Promise<TUser> {
     try {
+      if (id !== user.id) throw new Error('users');
+
       return await this.prisma.user.delete({
         where: { id },
-        select: { email: true },
+        select,
       });
     } catch (error) {
+      if (error.message.substring('users')) {
+        throw new HttpException(
+          'You cannot delete other users!',
+          HttpStatus.CONFLICT,
+        );
+      }
       throw new HttpException(
         'Internal Server Error ',
         HttpStatus.INTERNAL_SERVER_ERROR,
