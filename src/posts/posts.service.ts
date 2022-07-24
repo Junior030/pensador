@@ -4,6 +4,13 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
+type TPayload = {
+  id: number;
+  email: string;
+  name: string;
+  iat: number;
+  exp: number;
+};
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
@@ -45,8 +52,16 @@ export class PostsService {
     }
   }
 
-  async update(id: number, updatePostsDto: UpdatePostDto): Promise<Post> {
+  async update(
+    id: number,
+    updatePostsDto: UpdatePostDto,
+    user: TPayload,
+  ): Promise<Post> {
     try {
+      const post = await this.findOne(id);
+
+      if (post.userId !== user.id) throw new Error('posts');
+
       return await this.prisma.posts.update({
         where: {
           id,
@@ -54,6 +69,12 @@ export class PostsService {
         data: updatePostsDto,
       });
     } catch (error) {
+      if (error.message.substring('posts')) {
+        throw new HttpException(
+          'You cannot edit other users` posts!',
+          HttpStatus.CONFLICT,
+        );
+      }
       throw new HttpException(
         'Internal Server Error ',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -61,12 +82,21 @@ export class PostsService {
     }
   }
 
-  async remove(id: number): Promise<Post> {
+  async remove(id: number, user: TPayload): Promise<Post> {
     try {
+      const post = await this.findOne(id);
+
+      if (post.userId !== user.id) throw new Error('posts');
       return await this.prisma.posts.delete({
         where: { id },
       });
     } catch (error) {
+      if (error.message.substring('posts')) {
+        throw new HttpException(
+          'You cannot delete other users` posts!',
+          HttpStatus.CONFLICT,
+        );
+      }
       throw new HttpException(
         'Internal Server Error ',
         HttpStatus.INTERNAL_SERVER_ERROR,
