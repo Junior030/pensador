@@ -33,6 +33,12 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('complete')
+  findAllComplete() {
+    return this.usersService.findAllComplete();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);

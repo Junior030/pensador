@@ -58,6 +58,35 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Environment variables
+
+```bash
+SECRET_JWT=""
+PORT=0000
+DATABASE_URL=""
+```
+
+## Tools used
+
+<div style="display: flex; justify-content: space-between">
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white">
+  <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white">
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white">
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white">
+  <img src="https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white">
+  <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white">
+  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white">
+</div>
+<br/>
+
+## Documentation
+
+[Documentation](https://pensador-production.up.railway.app/api#/)
+
+## API
+
+[API](https://pensador-production.up.railway.app)
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).

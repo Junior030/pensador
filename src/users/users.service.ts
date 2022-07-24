@@ -57,6 +57,34 @@ export class UsersService {
     }
   }
 
+  async findAllComplete(): Promise<object[]> {
+    try {
+      return await this.prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          posts: {
+            select: {
+              id: true,
+              content: true,
+              createdAt: true,
+              updatedAat: true,
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Internal Server Error ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async findOne(id: number): Promise<TUser> {
     try {
       return await this.prisma.user.findUnique({
